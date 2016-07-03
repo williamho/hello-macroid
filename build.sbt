@@ -3,19 +3,17 @@ scalaVersion := "2.11.8"
 androidBuild
 platformTarget in Android := "android-23"
 
+val androidVersion = "23.2.1"
+
 libraryDependencies ++= Seq(
-  aar("org.macroid" %% "macroid" % "2.0.0-M4")
+  aar("org.macroid" %% "macroid" % "2.0.0-M5"),
+  aar("com.fortysevendeg" %% "macroid-extras" % "0.3"),
+  aar("com.android.support" % "appcompat-v7" % androidVersion)
 )
 
 proguardScala in Android := true
 proguardOptions in Android ++= Seq(
-  "-keep class scala.Dynamic"
-)
-
-scalacOptions in (Compile, compile) ++=
-  (dependencyClasspath in Compile).value.files.map("-P:wartremover:cp:" + _.toURI.toURL)
-
-scalacOptions in (Compile, compile) ++= Seq(
-  "-P:wartremover:traverser:macroid.warts.CheckUi"
+  "-keep class scala.Dynamic",
+  "-ignorewarnings"
 )
 

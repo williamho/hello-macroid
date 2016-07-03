@@ -12,7 +12,7 @@
   <application
     android:icon="@drawable/android:star_big_on"
     android:label="Hello Macroid"
-    android:theme="@android:style/Theme.DeviceDefault">
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
     <activity
       android:name=".MainActivity"
