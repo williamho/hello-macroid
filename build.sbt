@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
 proguardScala in Android := true
 proguardOptions in Android ++= Seq(
   "-keep class scala.Dynamic",
+  "-keep class scala.util.Try",
   "-ignorewarnings"
 )
 
