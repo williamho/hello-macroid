@@ -2,7 +2,7 @@
   <!-- Main colors -->
   <color name="primary">#cf0303</color>
   <color name="primary_dark">#b71c1c</color>
-  <color name="color_control_highlight">#cf0303</color>
+  <color name="color_control_highlight">#ffffff</color>
   <color name="accent">#b71c1c</color>
   <color name="toolbar_title">#ffffff</color>
 

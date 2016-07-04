@@ -5,6 +5,8 @@
     <item name="android:windowBackground">@color/background_app</item>
     <item name="android:colorBackground">@color/background_app</item>
 
+    <item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner.Underlined</item>
+
     <item name="actionBarStyle">@style/ThemeOverlay.AppCompat.ActionBar</item>
 
     <item name="colorPrimary">@color/primary</item>

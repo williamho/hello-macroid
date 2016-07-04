@@ -7,7 +7,8 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view._
-import android.widget.{ListView, LinearLayout, TextView, Button, EditText}
+import android.widget._
+import com.fortysevendeg.macroid.extras.SpinnerTweaks._
 import com.fortysevendeg.macroid.extras.ToolbarTweaks._
 import com.fortysevendeg.macroid.extras.ViewTweaks._
 import macroid._
@@ -18,6 +19,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
   var toolbar = slot[Toolbar]
   var textView = slot[TextView]
+  var toolbarSecondRow = slot[Toolbar]
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
@@ -38,10 +40,10 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
   }
 
   lazy val uiToolbar: Ui[Toolbar] = {
-    implicit val context = implicitly[ActivityContextWrapper]
+    val context = implicitly[ActivityContextWrapper].getOriginal
 
     val contextTheme = new ContextThemeWrapper(
-      context.getOriginal,
+      context,
       R.style.ThemeOverlay_AppCompat_Dark_ActionBar
     )
     val _toolbar = new Toolbar(contextTheme)
@@ -49,7 +51,40 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
     setSupportActionBar(_toolbar)
 
-    Ui(_toolbar) <~ LpTweaks.matchWidth <~ vBackground(R.color.primary)
+    Ui(_toolbar) <~ 
+      LpTweaks.matchWidth <~ 
+      vBackground(R.color.primary) <~
+      addViews(
+        List(
+          widget[Toolbar] <~ addViews(
+            List(
+              widget[Spinner] <~ sAdapter {
+                val adapter = new ArrayAdapter[String](
+                  context,
+                  android.R.layout.simple_spinner_item,
+                  Array("Title", "Artist")
+                )
+                adapter.setDropDownViewResource(
+                  android.R.layout.simple_spinner_dropdown_item
+                )
+                adapter
+              }
+              ,
+              widget[Spinner] <~ sAdapter {
+                val adapter = new ArrayAdapter[String](
+                  context,
+                  android.R.layout.simple_spinner_item,
+                  Array("Starts with", "Contains")
+                )
+                adapter.setDropDownViewResource(
+                  android.R.layout.simple_spinner_dropdown_item
+                )
+                adapter
+              }
+            )
+          ) <~ wire(toolbarSecondRow)
+        )
+      )
   }
 
   // in fragments, this has inflater as a second arg
