@@ -3,8 +3,8 @@ package com.example.hello
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.view.MenuItemCompat
 import android.support.v4.app.FragmentActivity
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view._
@@ -19,7 +19,6 @@ import macroid.FullDsl._
 class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
   var toolbar = slot[Toolbar]
   var textView = slot[TextView]
-  var toolbarSecondRow = slot[Toolbar]
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
@@ -68,13 +67,18 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
     var searchField = slot[SearchView]
 
+
+    val context: ContextWrapper = ContextWrapper(
+      getSupportActionBar().getThemedContext()
+    )
+
     // ugh this is a mess
     val searchView = Ui.get {
       layout[TableLayout](
         layout[TableRow](
-          widget[Spinner] <~ sAdapter {
+          widget[Spinner](context) <~ sAdapter {
             val adapter = new ArrayAdapter[String](
-              activityContextWrapper.getOriginal,
+              context.getOriginal,
               android.R.layout.simple_spinner_item,
               Array("Title", "Artist")
             )
@@ -83,9 +87,9 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
             )
             adapter
           } <~ weight(1),
-          widget[Spinner] <~ sAdapter {
+          widget[Spinner](context) <~ sAdapter {
             val adapter = new ArrayAdapter[String](
-              activityContextWrapper.getOriginal,
+              context.getOriginal,
               android.R.layout.simple_spinner_item,
               Array("starts with", "contains")
             )
@@ -96,7 +100,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
           } <~ weight(1)
         ),
         layout[TableRow](
-          widget[SearchView] <~ wire(searchField)
+          widget[SearchView](context) <~ wire(searchField)
         )
       ) <~ vertical
     }
