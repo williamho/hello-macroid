@@ -3,6 +3,7 @@ package com.example.hello
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.view.MenuItemCompat
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -16,7 +17,6 @@ import macroid.contrib._
 import macroid.FullDsl._
 
 class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
-
   var toolbar = slot[Toolbar]
   var textView = slot[TextView]
   var toolbarSecondRow = slot[Toolbar]
@@ -40,10 +40,8 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
   }
 
   lazy val uiToolbar: Ui[Toolbar] = {
-    val context = implicitly[ActivityContextWrapper].getOriginal
-
     val contextTheme = new ContextThemeWrapper(
-      context,
+      activityContextWrapper.getOriginal,
       R.style.ThemeOverlay_AppCompat_Dark_ActionBar
     )
     val _toolbar = new Toolbar(contextTheme)
@@ -51,45 +49,56 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
     setSupportActionBar(_toolbar)
 
-    Ui(_toolbar) <~ 
-      LpTweaks.matchWidth <~ 
-      vBackground(R.color.primary) <~
-      addViews(
-        List(
-          widget[Toolbar] <~ addViews(
-            List(
-              widget[Spinner] <~ sAdapter {
-                val adapter = new ArrayAdapter[String](
-                  context,
-                  android.R.layout.simple_spinner_item,
-                  Array("Title", "Artist")
-                )
-                adapter.setDropDownViewResource(
-                  android.R.layout.simple_spinner_dropdown_item
-                )
-                adapter
-              }
-              ,
-              widget[Spinner] <~ sAdapter {
-                val adapter = new ArrayAdapter[String](
-                  context,
-                  android.R.layout.simple_spinner_item,
-                  Array("Starts with", "Contains")
-                )
-                adapter.setDropDownViewResource(
-                  android.R.layout.simple_spinner_dropdown_item
-                )
-                adapter
-              }
-            )
-          ) <~ wire(toolbarSecondRow)
-        )
-      )
+    Ui(_toolbar) <~ LpTweaks.matchWidth <~ vBackground(R.color.primary)
   }
 
   // in fragments, this has inflater as a second arg
   override def onCreateOptionsMenu(menu: Menu): Boolean = {
-    getMenuInflater.inflate(R.menu.search_menu, menu)
+    val item = menu.add(0, Id.menuItemSearch, 0, "Search") // TODO: use R string
+    MenuItemCompat.setShowAsAction(
+      item,
+      MenuItemCompat.SHOW_AS_ACTION_ALWAYS |
+      MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
+    )
+
+    var searchField = slot[SearchView]
+    val searchView = Ui.get {
+      layout[LinearLayout](
+        layout[LinearLayout](
+          widget[Spinner] <~ sAdapter {
+            val adapter = new ArrayAdapter[String](
+              activityContextWrapper.getOriginal,
+              android.R.layout.simple_spinner_item,
+              Array("Title", "Artist")
+            )
+            adapter.setDropDownViewResource(
+              android.R.layout.simple_spinner_dropdown_item
+            )
+            adapter
+          },
+          widget[Spinner] <~ sAdapter {
+            val adapter = new ArrayAdapter[String](
+              activityContextWrapper.getOriginal,
+              android.R.layout.simple_spinner_item,
+              Array("starts with", "contains")
+            )
+            adapter.setDropDownViewResource(
+              android.R.layout.simple_spinner_dropdown_item
+            )
+            adapter
+          }
+        ),
+        widget[SearchView] <~ wire(searchField)
+      ) <~ vertical
+    }
+
+    searchField.foreach { s =>
+      s.setIconifiedByDefault(false)
+      s.setSubmitButtonEnabled(true)
+    }
+
+    MenuItemCompat.setActionView(item, searchView)
+
     super.onCreateOptionsMenu(menu)
   }
 
