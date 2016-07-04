@@ -17,7 +17,7 @@ class ExampleFragment extends Fragment with Contexts[Fragment] {
   private def randString(): String =
     scala.util.Random.alphanumeric.take(10).mkString
 
-  val songs = (1 to 100).map { i =>
+  val songs = (10000 to 10100).map { i =>
     Song(i.toString, randString(), randString())
   }.toVector
 

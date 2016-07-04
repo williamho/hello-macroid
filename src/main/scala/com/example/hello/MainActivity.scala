@@ -25,15 +25,9 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
     setContentView {
       Ui.get {
         layout[LinearLayout](
-          widget[Toolbar]
+          uiToolbar
             <~ tbTitle("Hello")
-            <~ tbBackgroundColor(R.color.primary)
-            <~ vElevation(4.dp)
-            <~ LpTweaks.matchWidth
-            <~ wire(toolbar)
-            <~ Tweak[Toolbar]{ t => 
-              setSupportActionBar(t)
-            },
+            <~ wire(toolbar),
           fragment[ExampleFragment]
             .pass(bundle("page" -> 1))
             .framed(Id.exampleFragment, Tag.exampleFragment)
@@ -41,6 +35,21 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
         ) <~ vertical
       }
     }
+  }
+
+  lazy val uiToolbar: Ui[Toolbar] = {
+    implicit val context = implicitly[ActivityContextWrapper]
+
+    val contextTheme = new ContextThemeWrapper(
+      context.getOriginal,
+      R.style.ThemeOverlay_AppCompat_Dark_ActionBar
+    )
+    val _toolbar = new Toolbar(contextTheme)
+    _toolbar.setPopupTheme(R.style.ThemeOverlay_AppCompat_Light)
+
+    setSupportActionBar(_toolbar)
+
+    Ui(_toolbar) <~ LpTweaks.matchWidth <~ vBackground(R.color.primary)
   }
 
   // in fragments, this has inflater as a second arg
