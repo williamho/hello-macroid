@@ -61,10 +61,17 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
       MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
     )
 
+    def weight(w: Float) = Tweak[View] { v =>
+      val params = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, w)
+      v.setLayoutParams(params)
+    }
+
     var searchField = slot[SearchView]
+
+    // ugh this is a mess
     val searchView = Ui.get {
-      layout[LinearLayout](
-        layout[LinearLayout](
+      layout[TableLayout](
+        layout[TableRow](
           widget[Spinner] <~ sAdapter {
             val adapter = new ArrayAdapter[String](
               activityContextWrapper.getOriginal,
@@ -75,7 +82,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
               android.R.layout.simple_spinner_dropdown_item
             )
             adapter
-          },
+          } <~ weight(1),
           widget[Spinner] <~ sAdapter {
             val adapter = new ArrayAdapter[String](
               activityContextWrapper.getOriginal,
@@ -86,9 +93,11 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
               android.R.layout.simple_spinner_dropdown_item
             )
             adapter
-          }
+          } <~ weight(1)
         ),
-        widget[SearchView] <~ wire(searchField)
+        layout[TableRow](
+          widget[SearchView] <~ wire(searchField)
+        )
       ) <~ vertical
     }
 
