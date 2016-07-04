@@ -3,17 +3,18 @@ package com.example.hello
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
-import android.view.{ContextThemeWrapper, Menu, MenuItem, MenuInflater}
 import android.support.v7.widget.Toolbar
+import android.view._
 import android.widget.{ListView, LinearLayout, TextView, Button, EditText}
+import com.fortysevendeg.macroid.extras.ToolbarTweaks._
+import com.fortysevendeg.macroid.extras.ViewTweaks._
 import macroid._
 import macroid.contrib._
 import macroid.FullDsl._
-import com.fortysevendeg.macroid.extras.ToolbarTweaks._
-import com.fortysevendeg.macroid.extras.ViewTweaks._
 
-class MainActivity extends AppCompatActivity with Contexts[Activity] {
+class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
   var toolbar = slot[Toolbar]
   var textView = slot[TextView]
@@ -33,9 +34,7 @@ class MainActivity extends AppCompatActivity with Contexts[Activity] {
             <~ Tweak[Toolbar]{ t => 
               setSupportActionBar(t)
             },
-          widget[TextView]
-            <~ wire(textView)
-            <~ text("Initial text")
+          fragment[ExampleFragment].framed(Id.exampleFragment, Tag.exampleFragment)
         ) <~ vertical
       }
     }
