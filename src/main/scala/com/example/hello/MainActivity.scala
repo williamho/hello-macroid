@@ -28,13 +28,16 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
           widget[Toolbar]
             <~ tbTitle("Hello")
             <~ tbBackgroundColor(R.color.primary)
-            <~ vElevation(4.0f)
+            <~ vElevation(4.dp)
             <~ LpTweaks.matchWidth
             <~ wire(toolbar)
             <~ Tweak[Toolbar]{ t => 
               setSupportActionBar(t)
             },
-          fragment[ExampleFragment].framed(Id.exampleFragment, Tag.exampleFragment)
+          fragment[ExampleFragment]
+            .pass(bundle("page" -> 1))
+            .framed(Id.exampleFragment, Tag.exampleFragment)
+            <~ LpTweaks.matchParent
         ) <~ vertical
       }
     }
