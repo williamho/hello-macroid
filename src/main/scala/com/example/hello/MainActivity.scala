@@ -96,7 +96,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
         layout[TableRow](
           widget[SearchView](context) <~ wire(searchField)
         )
-      ) <~ vertical <~ padding(top = 8.dp)
+      ) <~ vertical <~ padding(top = 38.dp, bottom = -4.dp)
     }
 
     searchField.foreach { s =>
