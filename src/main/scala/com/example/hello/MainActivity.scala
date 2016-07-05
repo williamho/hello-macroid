@@ -42,7 +42,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
   lazy val uiToolbar: Ui[Toolbar] = {
     val contextTheme = new ContextThemeWrapper(
       activityContextWrapper.getOriginal,
-      R.style.ThemeOverlay_AppCompat_Dark_ActionBar
+      R.style.AppTheme_Toolbar
     )
     val _toolbar = new Toolbar(contextTheme)
     _toolbar.setPopupTheme(R.style.ThemeOverlay_AppCompat_Light)
@@ -76,9 +76,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
         android.R.layout.simple_spinner_item,
         choices.toArray
       )
-      adapter.setDropDownViewResource(
-        android.R.layout.simple_spinner_dropdown_item
-      )
+      adapter.setDropDownViewResource(R.layout.toolbar_dropdown_item)
       adapter
     }
 
@@ -99,10 +97,7 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
       ) <~ vertical <~ padding(top = 38.dp, bottom = -4.dp)
     }
 
-    searchField.foreach { s =>
-      s.setIconifiedByDefault(false)
-      s.setSubmitButtonEnabled(true)
-    }
+    searchField.foreach(_.setIconifiedByDefault(false))
 
     MenuItemCompat.setActionView(item, searchView)
 

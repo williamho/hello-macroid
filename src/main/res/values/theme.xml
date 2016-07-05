@@ -14,6 +14,12 @@
   </style>
 
   <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <item name="android:spinnerStyle">@style/AppTheme.Toolbar.Spinner</item>
+    <item name="colorControlNormal">@color/background_app</item>
+    <item name="colorControlActivated">@color/background_app</item>
+  </style>
+
+  <style name="AppTheme.Toolbar.Spinner" parent="Widget.AppCompat.Spinner.Underlined">
     <item name="android:popupBackground">@color/background_app</item>
   </style>
 </resources>
