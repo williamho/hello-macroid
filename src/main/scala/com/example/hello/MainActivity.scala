@@ -6,8 +6,9 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import android.support.v7.widget.{AppCompatSpinner, Toolbar}
 import android.view._
+import android.view.ViewGroup.LayoutParams._
 import android.widget._
 import com.fortysevendeg.macroid.extras.SpinnerTweaks._
 import com.fortysevendeg.macroid.extras.ToolbarTweaks._
@@ -48,11 +49,18 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
     setSupportActionBar(_toolbar)
 
-    Ui(_toolbar) <~ LpTweaks.matchWidth <~ vBackground(R.color.primary)
+    Ui(_toolbar) <~
+      LpTweaks.matchWidth <~
+      vBackground(R.color.primary) <~
+      vElevation(4.dp)
   }
 
   // in fragments, this has inflater as a second arg
   override def onCreateOptionsMenu(menu: Menu): Boolean = {
+    val context: ContextWrapper = ContextWrapper(
+      getSupportActionBar().getThemedContext()
+    )
+
     val item = menu.add(0, Id.menuItemSearch, 0, "Search") // TODO: use R string
     MenuItemCompat.setShowAsAction(
       item,
@@ -60,49 +68,35 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
       MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
     )
 
-    def weight(w: Float) = Tweak[View] { v =>
-      val params = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, w)
-      v.setLayoutParams(params)
-    }
-
     var searchField = slot[SearchView]
 
-
-    val context: ContextWrapper = ContextWrapper(
-      getSupportActionBar().getThemedContext()
-    )
+    def sChoices(choices: String*): Tweak[Spinner] = sAdapter {
+      val adapter = new ArrayAdapter[String](
+        context.getOriginal, // TODO: accept ContextWrapper implicit
+        android.R.layout.simple_spinner_item,
+        choices.toArray
+      )
+      adapter.setDropDownViewResource(
+        android.R.layout.simple_spinner_dropdown_item
+      )
+      adapter
+    }
 
     // ugh this is a mess
     val searchView = Ui.get {
       layout[TableLayout](
         layout[TableRow](
-          widget[Spinner](context) <~ sAdapter {
-            val adapter = new ArrayAdapter[String](
-              context.getOriginal,
-              android.R.layout.simple_spinner_item,
-              Array("Title", "Artist")
-            )
-            adapter.setDropDownViewResource(
-              android.R.layout.simple_spinner_dropdown_item
-            )
-            adapter
-          } <~ weight(1),
-          widget[Spinner](context) <~ sAdapter {
-            val adapter = new ArrayAdapter[String](
-              context.getOriginal,
-              android.R.layout.simple_spinner_item,
-              Array("starts with", "contains")
-            )
-            adapter.setDropDownViewResource(
-              android.R.layout.simple_spinner_dropdown_item
-            )
-            adapter
-          } <~ weight(1)
+          widget[AppCompatSpinner](context)
+            <~ sChoices("Title", "Artist")
+            <~ lp[TableRow](0, WRAP_CONTENT, 1),
+          widget[AppCompatSpinner](context)
+            <~ sChoices("starts with", "contains")
+            <~ lp[TableRow](0, WRAP_CONTENT, 1)
         ),
         layout[TableRow](
           widget[SearchView](context) <~ wire(searchField)
         )
-      ) <~ vertical
+      ) <~ vertical <~ padding(top = 8.dp)
     }
 
     searchField.foreach { s =>
@@ -112,7 +106,18 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
 
     MenuItemCompat.setActionView(item, searchView)
 
+
     super.onCreateOptionsMenu(menu)
+    /*
+    getMenuInflater().inflate(R.menu.search_menu, menu)
+
+    Ui.run {
+      Ui(findViewById(R.id.title_or_artist_spinner).asInstanceOf[Spinner])<~ sChoices(Array("Artist", "Title"))
+      this.find[Spinner](R.id.match_type_spinner) <~ sChoices(Array("starts with", "contains"))
+    }
+
+    true
+    */
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean = item.getItemId match {

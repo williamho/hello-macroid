@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
 proguardScala in Android := true
 proguardOptions in Android ++= Seq(
   "-keep class scala.Dynamic",
-  "-keep class scala.math.Numeric$IntIsIntegral$", // `123.dp`
+  "-keep class scala.math.Numeric$IntIsIntegral$",
+  "-keep class scala.math.Numeric$Implicits$",
   "-keep class scala.util.Try",
   "-keep class macroid.IdGenerator",
   "-ignorewarnings"
