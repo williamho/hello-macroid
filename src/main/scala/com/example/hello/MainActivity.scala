@@ -13,6 +13,7 @@ import android.widget._
 import com.fortysevendeg.macroid.extras.SpinnerTweaks._
 import com.fortysevendeg.macroid.extras.ToolbarTweaks._
 import com.fortysevendeg.macroid.extras.ViewTweaks._
+//import com.fortysevendeg.macroid.extras.FragmentExtras
 import macroid._
 import macroid.contrib._
 import macroid.FullDsl._
@@ -31,7 +32,6 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
             <~ tbTitle("Hello")
             <~ wire(toolbar),
           fragment[ExampleFragment]
-            .pass(bundle("page" -> 1))
             .framed(Id.exampleFragment, Tag.exampleFragment)
             <~ LpTweaks.matchParent
         ) <~ vertical
@@ -80,16 +80,21 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
       adapter
     }
 
+    var titleOrArtist = slot[Spinner]
+    var matchType = slot[Spinner]
+
     // ugh this is a mess
     val searchView = Ui.get {
       layout[TableLayout](
         layout[TableRow](
           widget[AppCompatSpinner](context)
             <~ sChoices("Title", "Artist")
-            <~ lp[TableRow](0, WRAP_CONTENT, 1),
+            <~ lp[TableRow](0, WRAP_CONTENT, 1)
+            <~ wire(titleOrArtist),
           widget[AppCompatSpinner](context)
             <~ sChoices("starts with", "contains")
             <~ lp[TableRow](0, WRAP_CONTENT, 1)
+            <~ wire(matchType)
         ),
         layout[TableRow](
           widget[SearchView](context) <~ wire(searchField)
@@ -97,7 +102,24 @@ class MainActivity extends AppCompatActivity with Contexts[FragmentActivity] {
       ) <~ vertical <~ padding(top = 38.dp, bottom = -4.dp)
     }
 
-    searchField.foreach(_.setIconifiedByDefault(false))
+    searchField.foreach { s =>
+      s.setIconifiedByDefault(false)
+      s.setOnQueryTextListener(new SearchView.OnQueryTextListener {
+        def onQueryTextChange(query: String): Boolean = false
+        def onQueryTextSubmit(query: String): Boolean = {
+          for {
+            toa <- titleOrArtist
+            mt <- matchType
+          } yield {
+            println(query)
+            println(toa.getSelectedItem)
+            println(mt.getSelectedItem)
+          }
+
+          true
+        }
+      })
+    }
 
     MenuItemCompat.setActionView(item, searchView)
 
